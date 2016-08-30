@@ -30,37 +30,67 @@ logging.getLogger("ofdpy.odlparse").addHandler(ch)
 
 ofdpa_instance = ofdpa.OFDPA(mode="ODL", controller_ip="10.10.10.254", ofdpa_id="openflow:55930")
 
-# Configure topology. In this case, two servers with two NICs each, and one
-# OFDPA switch
-switch, nyx, ananke = topo.create_basic_tue_lab()
-
-# Start up the ping use case. After sending sending this to the ODL controller
-# with .ODL/send.py, the clients should be able to ping.
-node_3_mac = 0x90e2ba1fe649
-# Node 1 connected to port xe45 of TOR 1
-node_1_tor_1_port = 46
-# port xe46 of TOR 1 connected to port xe46 of TOR2
-tor_1_tor_2_port = 47
-# port xe47 of TOR 2 connected to port xe47 of TOR3
-tor_2_tor_3_port = 48
-# port xe45 of TOR 3 connected to node 3
-tor_3_node_3_port = 46
-node_1_mac = 0x90e2ba1fdfd1
-
-
-ethernet_1_mac = 0x04F4BC1395C0
-ethernet_2_mac = 0x04F4BC1395C1
-# port xe51 of TOR 1 is connected to ethernet tester
-tor_1_ethernet_1_port = 52
-# port xe51 of TOR 3 is connected to ethernet tester
-tor_3_ethernet_2_port = 52
+# When all switches are configured, all compute nodes should be able to ping.
+with open('topology', 'r') as file_:
+    for line in file_:
+        if not line.startswith('#') and line != '\n':
+            stripped = [x.strip() for x in line.split('=')]
+            globals()[stripped[0]] = int(stripped[1], 0)
 
 dummy_vlan = 10
-usecase.one_way_bridge(ofdpa_instance, dummy_vlan, tor_1_ethernet_1_port, (ethernet_2_mac, tor_1_tor_2_port))
-usecase.one_way_bridge(ofdpa_instance, dummy_vlan, tor_1_tor_2_port, (ethernet_1_mac, tor_1_ethernet_1_port))
+# Allow traffic from the XENA tester
+ofdpa.VLAN_VLAN_Filtering_Flow(ofdpa_instance, tor_1_xena_1_port, dummy_vlan)
+ofdpa.VLAN_Untagged_Packet_Port_VLAN_Assignment_Flow(ofdpa_instance,
+                                                     tor_1_xena_1_port,
+                                                     dummy_vlan)
+# Allow traffic from TOR2
+ofdpa.VLAN_VLAN_Filtering_Flow(ofdpa_instance, tor_1_tor_2_port, dummy_vlan)
+ofdpa.VLAN_Untagged_Packet_Port_VLAN_Assignment_Flow(ofdpa_instance,
+                                                     tor_1_tor_2_port,
+                                                     dummy_vlan)
+# Allow traffic compute node 1
+ofdpa.VLAN_VLAN_Filtering_Flow(ofdpa_instance, node_1_tor_1_port, dummy_vlan)
+ofdpa.VLAN_Untagged_Packet_Port_VLAN_Assignment_Flow(ofdpa_instance,
+                                                     node_1_tor_1_port,
+                                                     dummy_vlan)
 
-usecase.one_way_bridge(ofdpa_instance, dummy_vlan, node_1_tor_1_port, (node_3_mac, tor_1_tor_2_port))
-usecase.one_way_bridge(ofdpa_instance, dummy_vlan, tor_1_tor_2_port, (node_1_mac, node_1_tor_1_port))
+# Reroute traffic matching compute node 1 MAC to the compute node 1 port
+l2_interface_group = ofdpa.L2_Interface_Group(ofdpa_instance,
+                                              node_1_tor_1_port,
+                                              dummy_vlan,
+                                              pop_vlan=True)
+ofdpa.Bridging_Unicast_VLAN_Bridging_Flow(ofdpa_instance,
+                                          dummy_vlan,
+                                          node_1_mac,
+                                          l2_interface_group)
+
+# Reroute traffic matching compute node 3 MAC to TOR2 port
+l2_interface_group = ofdpa.L2_Interface_Group(ofdpa_instance,
+                                              tor_1_tor_2_port,
+                                              dummy_vlan,
+                                              pop_vlan=True)
+ofdpa.Bridging_Unicast_VLAN_Bridging_Flow(ofdpa_instance,
+                                          dummy_vlan,
+                                          node_3_mac,
+                                          l2_interface_group)
+
+# Reroute traffic matching XENA port 3 MAC to TOR2 port
+ofdpa.Bridging_Unicast_VLAN_Bridging_Flow(ofdpa_instance,
+                                          dummy_vlan,
+                                          xena_3_mac,
+                                          l2_interface_group)
+
+# Reroute traffic matching XENA port 1 to XENA port
+l2_interface_group = ofdpa.L2_Interface_Group(ofdpa_instance,
+                                              tor_1_xena_1_port,
+                                              dummy_vlan,
+                                              pop_vlan=True)
+ofdpa.Bridging_Unicast_VLAN_Bridging_Flow(ofdpa_instance,
+                                          dummy_vlan,
+                                          xena_1_mac,
+                                          l2_interface_group)
+
+
 ofdpa_instance.ODL_instance.write_to_file()
 
 # Remove the fake datapath that got created earlier to be sure. If you keep
