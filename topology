@@ -24,3 +24,4 @@ tor_3_xena_3_port = 52
 
 # set-TOR2-TOR3-circuit.sh, port xe48 of TOR 2 connected to port xe48 of TOR 3
 tor_2_tor_3_polatis = 49
+tor_1_tor_3_polatis = 49
