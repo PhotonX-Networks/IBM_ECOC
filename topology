@@ -12,7 +12,6 @@ node_1_mac = 0x90e2ba1fdfd1
 node_2_mac = 0x14dda94f40f6
 node_3_mac = 0x90e2ba1fe649
 
-
 xena_1_mac = 0x04F4BC1395C1
 xena_2_mac = 0x04F4BC1395C3
 xena_3_mac = 0x04F4BC1395C0
@@ -22,3 +21,6 @@ tor_1_xena_1_port = 52
 tor_2_xena_2_port = 52
 # port xe51 of TOR 3 is connected to xena tester
 tor_3_xena_3_port = 52
+
+# set-TOR2-TOR3-circuit.sh, port xe48 of TOR 2 connected to port xe48 of TOR 3
+tor_2_tor_3_polatis = 49
