@@ -50,9 +50,8 @@ Set up the 'default connection'; a L2-like bi-directonal path from compute node 
 - Add the flows to ODL. On the controller node:
 
     ``` 
-    cd tue_tor/OfdPy/examples/ODL/ibm_usecase/
-    cd two_way_l2_tor[1-3]
-    python send.py
+    cd tue_tor/OfdPy/examples/IBM_ECOC
+    python send_usecase.py send 0
     ```
 
 - The path should now be created. Check with a L2 ping (arping).
@@ -68,24 +67,24 @@ Set up the 'default connection'; a L2-like bi-directonal path from compute node 
         sudo arping 30.30.30.1 -t 90:e2:ba:1f:df:d1
         ```
 
-# DSCP rerouting
+# Polatis rerouting
+## Use-case 1: Private circuit
 - Add the flows to ODL. On the controller node:
 
     ``` 
-    cd tue_tor/OfdPy/examples/ODL/ibm_usecase/
-    cd reroute_dscp_63_polatis_tor[1,2]
-    python send.py
+    cd tue_tor/OfdPy/examples/IBM_ECOC
+    python send_usecase.py send 1
     ```
 
 - Check rerouting with packeth (Assumes the optical path was created correctly):
 
-    - On compute node 1:
+    - On compute node 2:
 
         ```
         packeth
         ```
 
-    - Load ibm > to_node1.packeth
+    - Load ibm > to_node3.packeth
     - Fill in:
         - Protocol = 00
         - TOS = 0xFC (DSCP 63)
@@ -94,8 +93,65 @@ Set up the 'default connection'; a L2-like bi-directonal path from compute node 
 - When you're done, remove the rerouting:
 
     ```
-    cd reroute_dscp_63_polatis_tor[1,2]
-    python remove.py
+    python send_usecase.py remove 1
+    ```
+
+## Use-case 2: Public circuit
+- Add the flows to ODL. On the controller node:
+
+    ``` 
+    cd tue_tor/OfdPy/examples/IBM_ECOC
+    python send_usecase.py send 2
+    ```
+
+- Check rerouting with packeth (Assumes the optical path was created correctly):
+
+    - On compute node 2:
+
+        ```
+        packeth
+        ```
+
+    - Load ibm > to_node3.packeth
+    - Fill in:
+        - Protocol = 00
+        - TOS = 0xFC (DSCP 63)
+    - Select interface `ens1f1`
+    - Send packet
+- When you're done, remove the rerouting:
+
+    ```
+    python send_usecase.py remove 2
+    ```
+
+## Use-case 3: All optical circuit
+- Remove the default case and add the flows to ODL. On the controller node:
+
+    ``` 
+    cd tue_tor/OfdPy/examples/IBM_ECOC
+    python send_usecase.py remove 0
+    python send_usecase.py send 3
+    ```
+
+- Check rerouting with packeth (Assumes the optical path was created correctly):
+
+    - On compute node 2:
+
+        ```
+        packeth
+        ```
+
+    - Load ibm > to_node3.packeth
+    - Fill in:
+        - Protocol = 00
+        - TOS = 0xFC (DSCP 63)
+    - Select interface `ens1f1`
+    - Send packet
+- When you're done, remove the rerouting and re-add the default case:
+
+    ```
+    python send_usecase.py remove 3
+    python send_usecase.py add 0
     ```
 
 # Debugging tools:
