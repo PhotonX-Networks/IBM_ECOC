@@ -48,11 +48,11 @@ dummy_vlan = 10
 #ofdpa.VLAN_Untagged_Packet_Port_VLAN_Assignment_Flow(ofdpa_instance,
 #                                                     tor_2_tor_3_port,
 #                                                     dummy_vlan)
-## Allow traffic compute node 3
-#ofdpa.VLAN_VLAN_Filtering_Flow(ofdpa_instance, tor_3_node_3_port, dummy_vlan)
-#ofdpa.VLAN_Untagged_Packet_Port_VLAN_Assignment_Flow(ofdpa_instance,
-#                                                     tor_3_node_3_port,
-#                                                     dummy_vlan)
+# Allow traffic compute node 3
+ofdpa.VLAN_VLAN_Filtering_Flow(ofdpa_instance, tor_3_node_3_port, dummy_vlan)
+ofdpa.VLAN_Untagged_Packet_Port_VLAN_Assignment_Flow(ofdpa_instance,
+                                                     tor_3_node_3_port,
+                                                     dummy_vlan)
 # Allow traffic from polatis
 ofdpa.VLAN_VLAN_Filtering_Flow(ofdpa_instance, tor_2_tor_3_polatis, dummy_vlan)
 ofdpa.VLAN_Untagged_Packet_Port_VLAN_Assignment_Flow(ofdpa_instance,
@@ -69,22 +69,22 @@ ofdpa.Bridging_Unicast_VLAN_Bridging_Flow(ofdpa_instance,
                                           node_3_mac,
                                           l2_interface_group)
 
-## Reroute traffic matching compute node 1 MAC to TOR2 port
-#l2_interface_group = ofdpa.L2_Interface_Group(ofdpa_instance,
-#                                              tor_2_tor_3_port,
-#                                              dummy_vlan,
-#                                              pop_vlan=True)
-#ofdpa.Bridging_Unicast_VLAN_Bridging_Flow(ofdpa_instance,
-#                                          dummy_vlan,
-#                                          node_1_mac,
-#                                          l2_interface_group)
-#
-## Reroute traffic matching compute node 2 MAC to TOR2 port
-#ofdpa.Bridging_Unicast_VLAN_Bridging_Flow(ofdpa_instance,
-#                                          dummy_vlan,
-#                                          node_2_mac,
-#                                          l2_interface_group)
-#
+# Reroute traffic matching compute node 1 MAC to polatis port
+l2_interface_group = ofdpa.L2_Interface_Group(ofdpa_instance,
+                                              tor_1_tor_3_polatis,
+                                              dummy_vlan,
+                                              pop_vlan=True)
+ofdpa.Bridging_Unicast_VLAN_Bridging_Flow(ofdpa_instance,
+                                          dummy_vlan,
+                                          node_1_mac,
+                                          l2_interface_group)
+
+# Reroute traffic matching compute node 2 MAC to polatis port
+ofdpa.Bridging_Unicast_VLAN_Bridging_Flow(ofdpa_instance,
+                                          dummy_vlan,
+                                          node_2_mac,
+                                          l2_interface_group)
+
 ## Reroute traffic matching XENA port 1 MAC to TOR2 port
 #ofdpa.Bridging_Unicast_VLAN_Bridging_Flow(ofdpa_instance,
 #                                          dummy_vlan,

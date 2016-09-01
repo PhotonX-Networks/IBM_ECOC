@@ -43,6 +43,11 @@ ofdpa.VLAN_VLAN_Filtering_Flow(ofdpa_instance, tor_2_node_2_port, dummy_vlan)
 ofdpa.VLAN_Untagged_Packet_Port_VLAN_Assignment_Flow(ofdpa_instance,
                                                      tor_2_node_2_port,
                                                      dummy_vlan)
+# Allow traffic from polatis
+ofdpa.VLAN_VLAN_Filtering_Flow(ofdpa_instance, tor_2_tor_3_polatis, dummy_vlan)
+ofdpa.VLAN_Untagged_Packet_Port_VLAN_Assignment_Flow(ofdpa_instance,
+                                                     tor_2_tor_3_polatis,
+                                                     dummy_vlan)
 # Allow traffic from the XENA tester
 ofdpa.VLAN_VLAN_Filtering_Flow(ofdpa_instance, tor_2_xena_2_port, dummy_vlan)
 ofdpa.VLAN_Untagged_Packet_Port_VLAN_Assignment_Flow(ofdpa_instance,
@@ -95,7 +100,7 @@ ofdpa.Bridging_Unicast_VLAN_Bridging_Flow(ofdpa_instance,
                                           node_3_mac,
                                           l2_interface_group)
 
-# Reroute traffic matching XENA port 3 MAC to TOR3 port
+# Reroute traffic matching XENA port 3 MAC to polatis port
 ofdpa.Bridging_Unicast_VLAN_Bridging_Flow(ofdpa_instance,
                                           dummy_vlan,
                                           xena_3_mac,
