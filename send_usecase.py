@@ -14,6 +14,8 @@ elif usecase == '2':
     base = 'dscp_to_optical_shared_tor'
 elif usecase == '3':
     base = 'dscp_to_optical_all_tor'
+elif usecase == '4':
+    base = 'dscp_to_optical_node1_tor'
 for i in ['1', '2', '3']:
     dir_ = base + i
     try:
