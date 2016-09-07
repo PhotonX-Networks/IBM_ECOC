@@ -39,12 +39,6 @@ with open('topology', 'r') as file_:
 
 dummy_vlan = 10
 dscp = 63
-# Allow traffic from Polatis port
-ofdpa.VLAN_VLAN_Filtering_Flow(ofdpa_instance, tor_2_tor_3_polatis, dummy_vlan)
-ofdpa.VLAN_Untagged_Packet_Port_VLAN_Assignment_Flow(ofdpa_instance,
-                                                     tor_2_tor_3_polatis,
-                                                     dummy_vlan)
-
 # Route traffic with dscp=60 and eth_dst=node_3_mac to node 3
 l2_Interface_group = ofdpa.L2_Interface_Group(ofdpa_instance,
                                               tor_3_node_3_port,

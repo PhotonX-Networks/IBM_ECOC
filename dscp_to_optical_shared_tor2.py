@@ -47,6 +47,7 @@ l2_Interface_group = ofdpa.L2_Interface_Group(ofdpa_instance,
 ofdpa.Policy_ACL_IPv4_VLAN_Flow(ofdpa_instance,
                            	l2_Interface_group,
                            	IP_DSCP=dscp,
+                                ETH_SRC=node_1_mac,
                                 ETH_DST=node_3_mac)
 
 print ('WARNING! scripts are stupid. Change flow numbers to avoid collisions')

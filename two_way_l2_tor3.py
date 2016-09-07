@@ -58,6 +58,12 @@ ofdpa.VLAN_VLAN_Filtering_Flow(ofdpa_instance, tor_3_node_3_port, dummy_vlan)
 ofdpa.VLAN_Untagged_Packet_Port_VLAN_Assignment_Flow(ofdpa_instance,
                                                      tor_3_node_3_port,
                                                      dummy_vlan)
+# Allow traffic from Polatis port
+ofdpa.VLAN_VLAN_Filtering_Flow(ofdpa_instance, tor_2_tor_3_polatis, dummy_vlan)
+ofdpa.VLAN_Untagged_Packet_Port_VLAN_Assignment_Flow(ofdpa_instance,
+                                                     tor_2_tor_3_polatis,
+                                                     dummy_vlan)
+
 
 # Reroute traffic matching compute node 3 MAC to the compute node 3 port
 l2_interface_group = ofdpa.L2_Interface_Group(ofdpa_instance,

@@ -40,14 +40,14 @@ with open('topology', 'r') as file_:
 dummy_vlan = 10
 dscp = 63
 # We assume traffic from TOR 2 is allowed
-l2_Interface_group = ofdpa.L2_Interface_Group(ofdpa_instance,
-                                              tor_3_node_3_port,
-                                              dummy_vlan,
-                                              pop_vlan=True)
-ofdpa.Policy_ACL_IPv4_VLAN_Flow(ofdpa_instance,
-                           	l2_Interface_group,
-                           	IP_DSCP=dscp,
-                                ETH_DST=node_3_mac)
+#l2_Interface_group = ofdpa.L2_Interface_Group(ofdpa_instance,
+#                                              tor_3_node_3_port,
+#                                              dummy_vlan,
+#                                              pop_vlan=True)
+#ofdpa.Policy_ACL_IPv4_VLAN_Flow(ofdpa_instance,
+#                           	l2_Interface_group,
+#                           	IP_DSCP=dscp,
+#                                ETH_DST=node_3_mac)
 
 print ('WARNING! scripts are stupid. Change flow numbers to avoid collisions')
 ofdpa_instance.ODL_instance.write_to_file()
