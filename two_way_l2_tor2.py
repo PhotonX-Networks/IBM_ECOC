@@ -38,15 +38,21 @@ with open('topology', 'r') as file_:
             globals()[stripped[0]] = int(stripped[1], 0)
 
 dummy_vlan = 10
+dscp = 63
 # Allow traffic from compute node 2
 ofdpa.VLAN_VLAN_Filtering_Flow(ofdpa_instance, tor_2_node_2_port, dummy_vlan)
 ofdpa.VLAN_Untagged_Packet_Port_VLAN_Assignment_Flow(ofdpa_instance,
                                                      tor_2_node_2_port,
                                                      dummy_vlan)
-# Allow traffic from the XENA tester
+# Allow traffic from the XENA tester port 2
 ofdpa.VLAN_VLAN_Filtering_Flow(ofdpa_instance, tor_2_xena_2_port, dummy_vlan)
 ofdpa.VLAN_Untagged_Packet_Port_VLAN_Assignment_Flow(ofdpa_instance,
                                                      tor_2_xena_2_port,
+                                                     dummy_vlan)
+# Allow traffic from the XENA tester port 4
+ofdpa.VLAN_VLAN_Filtering_Flow(ofdpa_instance, tor_2_xena_4_port, dummy_vlan)
+ofdpa.VLAN_Untagged_Packet_Port_VLAN_Assignment_Flow(ofdpa_instance,
+                                                     tor_2_xena_4_port,
                                                      dummy_vlan)
 # Allow traffic from TOR1
 ofdpa.VLAN_VLAN_Filtering_Flow(ofdpa_instance, tor_1_tor_2_port, dummy_vlan)
@@ -85,6 +91,13 @@ ofdpa.Bridging_Unicast_VLAN_Bridging_Flow(ofdpa_instance,
                                           node_2_mac,
                                           l2_interface_group)
 
+#ofdpa.Policy_ACL_IPv4_VLAN_Flow(ofdpa_instance,
+#                                l2_interface_group,
+#                                IP_DSCP=dscp,
+#                                ETH_DST=node_2_mac,
+#				priority=33000)
+#
+
 # Reroute traffic matching compute node 3 MAC to TOR3 port
 l2_interface_group = ofdpa.L2_Interface_Group(ofdpa_instance,
                                               tor_2_tor_3_port,
@@ -94,14 +107,24 @@ ofdpa.Bridging_Unicast_VLAN_Bridging_Flow(ofdpa_instance,
                                           dummy_vlan,
                                           node_3_mac,
                                           l2_interface_group)
+#ofdpa.Policy_ACL_IPv4_VLAN_Flow(ofdpa_instance,
+#                                l2_interface_group,
+#                                IP_DSCP=dscp,
+#                                ETH_DST=node_3_mac,
+#				priority=33000)
 
-# Reroute traffic matching XENA port 3 MAC to TOR3 port
+# Reroute traffic matching XENA port 0 MAC to TOR3 port
 ofdpa.Bridging_Unicast_VLAN_Bridging_Flow(ofdpa_instance,
                                           dummy_vlan,
-                                          xena_3_mac,
+                                          xena_0_mac,
+                                          l2_interface_group)
+# Reroute traffic matching XENA port 5 MAC to TOR3 port
+ofdpa.Bridging_Unicast_VLAN_Bridging_Flow(ofdpa_instance,
+                                          dummy_vlan,
+                                          xena_5_mac,
                                           l2_interface_group)
 
-# Reroute traffic matching XENA port 2 to XENA port
+# Reroute traffic matching XENA port 2 to XENA port 2
 l2_interface_group = ofdpa.L2_Interface_Group(ofdpa_instance,
                                               tor_2_xena_2_port,
                                               dummy_vlan,
@@ -109,6 +132,15 @@ l2_interface_group = ofdpa.L2_Interface_Group(ofdpa_instance,
 ofdpa.Bridging_Unicast_VLAN_Bridging_Flow(ofdpa_instance,
                                           dummy_vlan,
                                           xena_2_mac,
+                                          l2_interface_group)
+# Reroute traffic matching XENA port 4 to XENA port 4
+l2_interface_group = ofdpa.L2_Interface_Group(ofdpa_instance,
+                                              tor_2_xena_4_port,
+                                              dummy_vlan,
+                                              pop_vlan=True)
+ofdpa.Bridging_Unicast_VLAN_Bridging_Flow(ofdpa_instance,
+                                          dummy_vlan,
+                                          xena_4_mac,
                                           l2_interface_group)
 
 

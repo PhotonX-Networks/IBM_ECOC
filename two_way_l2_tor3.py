@@ -38,10 +38,15 @@ with open('topology', 'r') as file_:
             globals()[stripped[0]] = int(stripped[1], 0)
 
 dummy_vlan = 10
-# Allow traffic from the XENA tester
-ofdpa.VLAN_VLAN_Filtering_Flow(ofdpa_instance, tor_3_xena_3_port, dummy_vlan)
+# Allow traffic from the XENA tester port 0
+ofdpa.VLAN_VLAN_Filtering_Flow(ofdpa_instance, tor_3_xena_0_port, dummy_vlan)
 ofdpa.VLAN_Untagged_Packet_Port_VLAN_Assignment_Flow(ofdpa_instance,
-                                                     tor_3_xena_3_port,
+                                                     tor_3_xena_0_port,
+                                                     dummy_vlan)
+# Allow traffic from the XENA tester port 5
+ofdpa.VLAN_VLAN_Filtering_Flow(ofdpa_instance, tor_3_xena_5_port, dummy_vlan)
+ofdpa.VLAN_Untagged_Packet_Port_VLAN_Assignment_Flow(ofdpa_instance,
+                                                     tor_3_xena_5_port,
                                                      dummy_vlan)
 # Allow traffic from TOR2
 ofdpa.VLAN_VLAN_Filtering_Flow(ofdpa_instance, tor_2_tor_3_port, dummy_vlan)
@@ -92,14 +97,30 @@ ofdpa.Bridging_Unicast_VLAN_Bridging_Flow(ofdpa_instance,
                                           xena_2_mac,
                                           l2_interface_group)
 
-# Reroute traffic matching XENA port 3 to XENA port
+# Reroute traffic matching XENA port 4 MAC to TOR2 port
+ofdpa.Bridging_Unicast_VLAN_Bridging_Flow(ofdpa_instance,
+                                          dummy_vlan,
+                                          xena_4_mac,
+                                          l2_interface_group)
+
+# Reroute traffic matching XENA port 0 to XENA port
 l2_interface_group = ofdpa.L2_Interface_Group(ofdpa_instance,
-                                              tor_3_xena_3_port,
+                                              tor_3_xena_0_port,
                                               dummy_vlan,
                                               pop_vlan=True)
 ofdpa.Bridging_Unicast_VLAN_Bridging_Flow(ofdpa_instance,
                                           dummy_vlan,
-                                          xena_3_mac,
+                                          xena_0_mac,
+                                          l2_interface_group)
+
+# Reroute traffic matching XENA port 5 MAC to XENA port
+l2_interface_group = ofdpa.L2_Interface_Group(ofdpa_instance,
+                                              tor_3_xena_5_port,
+                                              dummy_vlan,
+                                              pop_vlan=True)
+ofdpa.Bridging_Unicast_VLAN_Bridging_Flow(ofdpa_instance,
+                                          dummy_vlan,
+                                          xena_5_mac,
                                           l2_interface_group)
 
 

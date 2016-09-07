@@ -74,10 +74,10 @@ ofdpa.Bridging_Unicast_VLAN_Bridging_Flow(ofdpa_instance,
                                           node_3_mac,
                                           l2_interface_group)
 
-# Reroute traffic matching XENA port 3 MAC to TOR2 port
+# Reroute traffic matching XENA port 0 MAC to TOR2 port
 ofdpa.Bridging_Unicast_VLAN_Bridging_Flow(ofdpa_instance,
                                           dummy_vlan,
-                                          xena_3_mac,
+                                          xena_0_mac,
                                           l2_interface_group)
 
 # Reroute traffic matching XENA port 1 to XENA port
