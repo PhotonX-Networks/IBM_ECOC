@@ -1,3 +1,18 @@
+
+#Summary
+ - [Generation of the scripts](#generation-of-the-scripts)
+ - [Preparation](#preparation)
+ - [Default connection](#default-connection)
+ - [Polatis rerouting](#polatis-rerouting)
+   - [Use-case 1: Private circuit](#use-case-1-private-circuit)
+   - [Use-case 2: Public circuit](#use-case-2-public-circuit)
+   - [Use-case 3: All optical circuit](#use-case-3-all-optical-circuit)
+   - [Use-case 4: Alternative route](#use-case-4-alternative-route)
+ - [Debugging tools](#debuggin-tools)
+
+# Generation of the scripts
+All scripts in the repository are meant to be run on a device with OfdPy installed. Please have a look at https://github.com/PhotonX-Networks/OfdPy. These scripts then generate the necessary XML files that can then be send the the OpenDayLight OpenFlowPlugin REST API.
+
 # Preparation
 There are still some kinks to work our between ODL and the TUe TOR, so try to start as clean as possible. So:
 - Start the ODL controller, from the controller node:
@@ -19,9 +34,10 @@ There are still some kinks to work our between ODL and the TUe TOR, so try to st
     killall ofagentapp*
     ```
 
-- Start the agents on the TORs. We're using ofagentapp.patched2 right now:
+- Start the agents on the TORs, preferably in a 'screen' environment. We're using ofagentapp.patched2 right now:
 
     ```
+    screen
     ./ofagentapp.patched2 --controller=10.10.10.254:6633 --dpid=0x000000000000DA7[A-C] &
     ```
 
@@ -46,11 +62,17 @@ There are still some kinks to work our between ODL and the TUe TOR, so try to st
         ```
     
 # Default connection
-Set up the 'default connection'; a L2-like bi-directonal path from compute node 1 to node 3 trough the three TORs. I've generated the necessary xml files to add all the flows and groups to ODL using the REST API. I also added a script how to send and delete them to ODL using Python transmissions.
+Set up the 'default connection'; a L2-like bi-directional path between compute node 1, 2 and 3 and the Xena tester ports trough the three TORs. I've generated the necessary XML files to add all the flows and groups to ODL using the REST API. I also added a script how to send and delete them to ODL using Python transmissions. The use case is:    <br/>
+CN1 <-> TOR1 <-> TOR2 <-> TOR3 <-> CN3 (normal + DSCP)    <br/>
+CN2 <-> TOR2 <-> TOR3 <-> CN3 (normal + DSCP)             <br/>
+XENA1 <-> TOR1 <-> TOR2 <-> TOR3 <-> XENA0                <br/>
+XENA2 <-> TOR2 <-> TOR3 <-> XENA0                         <br/>
+XENA4 <-> TOR2 <-> TOR3 <-> XENA5                         <br/>
+
 - Add the flows to ODL. On the controller node:
 
     ``` 
-    cd tue_tor/OfdPy/examples/IBM_ECOC
+    cd /home/ibm/tue_tor/OfdPy/examples/IBM_ECOC
     python send_usecase.py send 0
     ```
 
@@ -69,10 +91,13 @@ Set up the 'default connection'; a L2-like bi-directonal path from compute node 
 
 # Polatis rerouting
 ## Use-case 1: Private circuit
+This use-case is meant to be used in combination with [Default connection](#Default connection). These scripts add the following flow:    <br/>
+CN2 -> TOR2 -> Polatis -> TOR3 -> CN3 (DSCP)
+
 - Add the flows to ODL. On the controller node:
 
     ``` 
-    cd tue_tor/OfdPy/examples/IBM_ECOC
+    cd /home/ibm/tue_tor/OfdPy/examples/IBM_ECOC
     python send_usecase.py send 1
     ```
 
@@ -97,7 +122,10 @@ Set up the 'default connection'; a L2-like bi-directonal path from compute node 
     ```
 
 ## Use-case 2: Public circuit
-- Add the flows to ODL. On the controller node:
+This use-case is meant to be used in combination with [Default connection](#default-connection) and [Private circuit](#use-case-1-private-circuit). These scripts add the following flow:    <br/>
+CN1 -> TOR1 -> TOR2 -> Polatis -> TOR3 -> CN3 (DSCP)
+
+- Add the flows to ODL.  On the controller node:
 
     ``` 
     cd tue_tor/OfdPy/examples/IBM_ECOC
@@ -152,6 +180,16 @@ Set up the 'default connection'; a L2-like bi-directonal path from compute node 
     ```
     python send_usecase.py remove 3
     python send_usecase.py add 0
+    ```
+## Use-case 4: Alternative route
+This use case is meant to be used in combination with [Default connection](#default-connection), and provides a direct optical path between TOR1 and TOR3, like so:    <br/>
+CN1 -> TOR1 -> Polatis -> TOR3 -> CN3 (DSCP)
+
+- Add the flows to ODL.  On the controller node:
+
+    ``` 
+    cd tue_tor/OfdPy/examples/IBM_ECOC
+    python send_usecase.py send 2
     ```
 
 # Debugging tools:
