@@ -39,6 +39,7 @@ with open('topology', 'r') as file_:
 dummy_vlan = 10
 dscp = 63
 # We assume traffic from compute node 1 is allowed and Xena tester is allowed
+# Reroute DSCP tagged traffic for node 3 to optical path
 l2_Interface_group = ofdpa.L2_Interface_Group(ofdpa_instance,
                                               tor_1_tor_3_polatis,
                                               dummy_vlan,
@@ -46,7 +47,7 @@ l2_Interface_group = ofdpa.L2_Interface_Group(ofdpa_instance,
 ofdpa.Policy_ACL_IPv4_VLAN_Flow(ofdpa_instance,
                            	l2_Interface_group,
                            	IP_DSCP=dscp,
-                                ETH_SRC=node_1_mac)
+                                ETH_DST=node_3_mac)
 
 print ('WARNING! scripts are stupid. Change flow numbers to avoid collisions')
 ofdpa_instance.ODL_instance.write_to_file()
