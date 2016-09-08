@@ -69,11 +69,17 @@ ofdpa.Bridging_Unicast_VLAN_Bridging_Flow(ofdpa_instance,
                                           node_1_mac,
                                           l2_interface_group)
 
-# Reroute traffic matching compute node 3 MAC to TOR2 port
+# Reroute traffic matching compute node 2 MAC to TOR2 port
 l2_interface_group = ofdpa.L2_Interface_Group(ofdpa_instance,
                                               tor_1_tor_2_port,
                                               dummy_vlan,
                                               pop_vlan=True)
+ofdpa.Bridging_Unicast_VLAN_Bridging_Flow(ofdpa_instance,
+                                          dummy_vlan,
+                                          node_2_mac,
+                                          l2_interface_group)
+
+# Reroute traffic matching compute node 3 MAC to TOR2 port
 ofdpa.Bridging_Unicast_VLAN_Bridging_Flow(ofdpa_instance,
                                           dummy_vlan,
                                           node_3_mac,
